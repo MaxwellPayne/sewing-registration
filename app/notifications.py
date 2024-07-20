@@ -4,6 +4,7 @@ import traceback
 import sys
 import zoneinfo
 
+from app import constants
 from app.datastructures import CourseCapacityReport
 from app.mailgun import send_email
 from app.settings import get_settings
@@ -21,7 +22,7 @@ def send_bingo_emails(capacity_report: CourseCapacityReport) -> None:
         try:
             send_email(
                 to=recipient,
-                subject="COURSE IS OPEN!",
+                subject=constants.BINGO_EMAIL_SUBJECT,
                 text=(
                     f"The class now has {capacity_report.available_seats} seat(s) available out of "
                     f"{capacity_report.capacity} total spots!"
