@@ -5,7 +5,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import Select
 
-from app import settings
+from app import constants
+from app.settings import get_settings
 from app.datastructures import CourseCapacityReport
 
 
@@ -20,7 +21,7 @@ def navigate_to_course_capacity(fresh_driver: webdriver.Chrome) -> CourseCapacit
 
 
 def _navigate_to_initial_landing_page(driver: webdriver.Chrome) -> None:
-    driver.get(settings.CONTINUING_EDUCATION_LANDING_PAGE)
+    driver.get(constants.CONTINUING_EDUCATION_LANDING_PAGE)
     time.sleep(5)
 
 
@@ -39,8 +40,9 @@ def _do_login(driver: webdriver.Chrome) -> None:
     password_input = login_form.find_element(By.ID, "CURR_PWD")
     submit_input = login_form.find_element(By.NAME, "SUBMIT2")
 
-    username_input.send_keys(settings.USERNAME)
-    password_input.send_keys(settings.PASSWORD)
+    settings = get_settings()
+    username_input.send_keys(settings.username)
+    password_input.send_keys(settings.password)
     submit_input.click()
     time.sleep(5)
 
@@ -84,10 +86,10 @@ def _search_for_course(driver: webdriver.Chrome) -> None:
     identify_your_classes_table = driver.find_element(By.ID, "GROUP_Grp_LIST_VAR1").find_element(By.TAG_NAME, "table")
 
     course_prefix_select = Select(identify_your_classes_table.find_element(By.ID, "LIST_VAR1_1"))
-    course_prefix_select.select_by_value(settings.COURSE_PREFIX)
+    course_prefix_select.select_by_value(constants.COURSE_PREFIX)
 
     course_number_input = identify_your_classes_table.find_element(By.ID, "LIST_VAR2_1")
-    course_number_input.send_keys(settings.COURSE_NUMBER)
+    course_number_input.send_keys(constants.COURSE_NUMBER)
 
     submit_input = driver.find_element(By.NAME, "SUBMIT2")
     submit_input.click()
@@ -106,13 +108,13 @@ def _obtain_course_capacity_info(driver: webdriver.Chrome) -> CourseCapacityRepo
         found_desired_campus = False
         for td in tr.find_elements(By.TAG_NAME, "td"):
             for p in td.find_elements(By.TAG_NAME, "p"):
-                if p.text == settings.COURSE_CAMPUS_LOCATION:
+                if p.text == constants.COURSE_CAMPUS_LOCATION:
                     found_desired_campus = True
 
         if found_desired_campus:
             break
     else:
-        raise Exception(f"Could not find a course for campus '{settings.COURSE_CAMPUS_LOCATION}'")
+        raise Exception(f"Could not find a course for campus '{constants.COURSE_CAMPUS_LOCATION}'")
 
     # looks like "12 / 0"
     course_capacity_text = tr.find_elements(By.TAG_NAME, "td")[-1].text

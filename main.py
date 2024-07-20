@@ -2,10 +2,13 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 from app.datastructures import CourseCapacityReport
+from app.settings import get_settings
 from app.site_navigation import navigate_to_course_capacity
 
 
 def _main() -> None:
+    _ = get_settings()
+
     options = Options()
     # options.add_argument("--headless")
     options.add_argument("--no-sandbox")
