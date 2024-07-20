@@ -8,6 +8,7 @@ from app import constants
 from app.datastructures import CourseCapacityReport
 from app.mailgun import send_email
 from app.settings import get_settings
+from app.twilio import send_text_message
 
 
 logger = logging.getLogger(__name__)
@@ -54,3 +55,26 @@ def send_heartbeat_email() -> None:
         subject=f"Course Heartbeat at {now_dt_str}",
         text=text,
     )
+
+
+def send_bingo_texts(capacity_report: CourseCapacityReport) -> None:
+    # TODO: actual stuff
+    return
+    body: str = (
+        f"The class now has {capacity_report.available_seats} seat(s) available out of "
+        f"{capacity_report.capacity} total spots!"
+    )
+
+    for to_email in get_settings().bingo_notification_text_recipients:
+        try:
+            send_text_message(
+                to=to_email,
+                body=body,
+            )
+        except Exception:
+            logger.exception(
+                "Unexpected error whiles sending BINGO text message",
+                extra={
+                    "capacity_report": capacity_report,
+                },
+            )

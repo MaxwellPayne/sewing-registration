@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -27,7 +29,9 @@ def _main() -> None:
         driver.quit()
 
     if capacity_report.available_seats > 0:
-        app.notifications.send_bingo_emails(capacity_report)
+        with suppress(Exception):
+            app.notifications.send_bingo_emails(capacity_report)
+        app.notifications.send_bingo_texts(capacity_report)
     else:
         app.notifications.send_heartbeat_email()
 
