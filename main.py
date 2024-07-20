@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
+import app.notifications
 from app.datastructures import CourseCapacityReport
 from app.settings import get_settings
 from app.site_navigation import navigate_to_course_capacity
@@ -16,14 +17,19 @@ def _main() -> None:
 
     driver = webdriver.Chrome(options=options)
 
-    capacity_report: CourseCapacityReport | None = None
+    capacity_report: CourseCapacityReport
     try:
         capacity_report = navigate_to_course_capacity(driver)
+    except Exception:
+        app.notifications.send_heartbeat_email()
+        raise
     finally:
         driver.quit()
 
-    if capacity_report is not None:
-        print("CAPACITY...", capacity_report)
+    if capacity_report.available_seats > 0:
+        app.notifications.send_bingo_emails(capacity_report)
+    else:
+        app.notifications.send_heartbeat_email()
 
 
 if __name__ == "__main__":

@@ -11,6 +11,7 @@ selenium = "^4.22.0"
 pydantic = "^2.8.2"
 pydantic-settings = "^2.3.4"
 setuptools = "^71.0.4"
+requests = "^2.32.3"
 
 
 [build-system]

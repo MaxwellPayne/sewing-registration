@@ -41,8 +41,8 @@ def _do_login(driver: webdriver.Chrome) -> None:
     submit_input = login_form.find_element(By.NAME, "SUBMIT2")
 
     settings = get_settings()
-    username_input.send_keys(settings.username)
-    password_input.send_keys(settings.password)
+    username_input.send_keys(settings.acc_username)
+    password_input.send_keys(settings.acc_password)
     submit_input.click()
     time.sleep(5)
 
@@ -94,6 +94,7 @@ def _search_for_course(driver: webdriver.Chrome) -> None:
     submit_input = driver.find_element(By.NAME, "SUBMIT2")
     submit_input.click()
 
+    # TODO: this sleep is the best place to have a longer WebDriverWait
     time.sleep(15)
 
 
