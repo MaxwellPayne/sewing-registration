@@ -1,30 +1,26 @@
-FROM python:3.12.4
+FROM public.ecr.aws/lambda/python:3.12
 
-# please review all the latest versions here:
-# https://googlechromelabs.github.io/chrome-for-testing/
-ENV CHROMEDRIVER_VERSION=126.0.6478.182
+# install chrome dependencies
+RUN dnf install -y atk cups-libs gtk3 libXcomposite alsa-lib \
+    libXcursor libXdamage libXext libXi libXrandr libXScrnSaver \
+    libXtst pango at-spi2-atk libXt xorg-x11-server-Xvfb \
+    xorg-x11-xauth dbus-glib dbus-glib-devel nss mesa-libgbm jq unzip
 
-# install chrome
-RUN apt-get update && apt-get install -y wget && apt-get install -y zip
-RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
+COPY ./chrome-installer.sh ./chrome-installer.sh
+RUN ./chrome-installer.sh
+RUN rm ./chrome-installer.sh
 
-# install chromedriver
-RUN wget https://storage.googleapis.com/chrome-for-testing-public/$CHROMEDRIVER_VERSION/linux64/chromedriver-linux64.zip \
-  && unzip chromedriver-linux64.zip && rm -dfr chromedriver_linux64.zip \
-  && mv /chromedriver-linux64/chromedriver /usr/bin/chromedriver \
-  && chmod +x /usr/bin/chromedriver
-
-WORKDIR /usr/src/app
+WORKDIR ${LAMBDA_TASK_ROOT}
 
 RUN pip install poetry==1.8.3
 
 # install package dependencies
 COPY pyproject.toml .
 COPY poetry.lock .
-RUN poetry install
+RUN poetry export -f requirements.txt --output requirements.txt
+RUN pip install -r requirements.txt
 
 COPY main.py .
 COPY app ./app
 
-CMD poetry run python main.py
+CMD ["main.handler"]
