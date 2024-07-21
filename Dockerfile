@@ -26,6 +26,5 @@ RUN poetry install
 
 COPY main.py .
 COPY app ./app
-COPY .env .
 
 CMD poetry run python main.py
