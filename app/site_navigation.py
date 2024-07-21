@@ -1,3 +1,4 @@
+import logging
 import time
 
 from selenium import webdriver
@@ -10,14 +11,26 @@ from app.settings import get_settings
 from app.datastructures import CourseCapacityReport
 
 
+logger = logging.getLogger(__name__)
+
+
 def navigate_to_course_capacity(fresh_driver: webdriver.Chrome) -> CourseCapacityReport:
+    logger.info("Beginning navigation")
     _navigate_to_initial_landing_page(fresh_driver)
+    logger.info("Navigated to landing page")
     _navigate_to_login_page(fresh_driver)
+    logger.info("Navigated to login page")
     _do_login(fresh_driver)
+    logger.info("Logged in")
     _ensure_continuing_education_menu_page(fresh_driver)
+    logger.info("On continuing education menu page")
     _click_register_and_pay_link(fresh_driver)
+    logger.info("Submitting course search")
     _search_for_course(fresh_driver)
-    return _obtain_course_capacity_info(fresh_driver)
+    logger.info("Parsing course capacity")
+    capacity_report = _obtain_course_capacity_info(fresh_driver)
+    logger.info("Got course capacity report: %s", capacity_report)
+    return capacity_report
 
 
 def _navigate_to_initial_landing_page(driver: webdriver.Chrome) -> None:

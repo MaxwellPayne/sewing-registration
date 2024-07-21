@@ -1,3 +1,6 @@
+import argparse
+import logging
+import sys
 from contextlib import suppress
 
 from selenium import webdriver
@@ -9,13 +12,26 @@ from app.settings import get_settings
 from app.site_navigation import navigate_to_course_capacity
 
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt="%Y-%m-%d %H:%M:%S%z",
+    handlers=[logging.StreamHandler(sys.stdout)],
+)
+
+
 def _main() -> None:
     _ = get_settings()
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--show-gui", default=False, action="store_true")
+    args = parser.parse_args()
+
     options = Options()
-    # options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    if not args.show_gui:
+        options.add_argument("--headless")
 
     driver = webdriver.Chrome(options=options)
 
